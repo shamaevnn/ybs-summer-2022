@@ -1,0 +1,27 @@
+pytz
+requests
+python-dotenv
+ipython
+
+# Django
+django
+django-debug-toolbar
+whitenoise
+
+# Django 3.0 async requirements
+gunicorn
+uvicorn
+uvloop
+httptools
+
+# Databases
+psycopg2-binary
+dj-database-url
+
+# Distributed tasks
+celery
+redis
+django-celery-beat
+
+# monitoring
+sentry-sdk
