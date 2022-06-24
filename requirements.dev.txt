@@ -1,0 +1,13 @@
+# linters
+black==22.3.0
+mypy==0.931
+isort==5.10.0
+flake8==4.0.1
+pre-commit==2.18.1
+
+# tests
+pytest
+pytest-cov
+pytest-asyncio
+aioboto3==9.5.0
+pytest-mock==3.7.0

@@ -1,27 +1,13 @@
-pytz
-requests
-python-dotenv
-ipython
+aiogram==2.20
+fastapi==0.78.0
+uvicorn==0.17.6
+httpx==0.18.2
+python-dotenv==0.19.2
+construct-typing==0.5.2
+psycopg2-binary==2.9.3
+databases==0.5.5
+asyncpg==0.25.0
+alembic==1.7.5
 
-# Django
-django
-django-debug-toolbar
-whitenoise
-
-# Django 3.0 async requirements
-gunicorn
-uvicorn
-uvloop
-httptools
-
-# Databases
-psycopg2-binary
-dj-database-url
-
-# Distributed tasks
-celery
-redis
-django-celery-beat
-
-# monitoring
-sentry-sdk
+sentry-sdk==1.5.4
+aioredis==2.0.1

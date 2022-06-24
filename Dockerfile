@@ -1,12 +1,10 @@
-FROM python:3.8
+FROM python:3.10.5
+WORKDIR /app
 
-ENV PYTHONUNBUFFERED=1
+ADD requirements.txt /app/requirements.txt
 
-RUN mkdir /code
-WORKDIR /code
+RUN pip install --upgrade -r requirements.txt
 
-COPY requirements.txt /code/
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+COPY . /app
 
-COPY . /code/
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000"]
