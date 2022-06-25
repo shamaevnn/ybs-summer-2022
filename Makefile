@@ -11,6 +11,9 @@ makemigrations:
 migrate:
 	PYTHONPATH=. alembic upgrade head
 
+downgrade:
+	PYTHONPATH=. alembic downgrade head-1
+
 dev:
 	uvicorn main:app --host 0.0.0.0 --reload
 
