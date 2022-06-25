@@ -9,7 +9,7 @@ async def get_items_tree_with_additional_info(
     start_node_uuid: str,
 ) -> Optional[DbItemWithAddInfo]:
     """
-    check example of response in
+    check example of response in app/examples/db_item_with_add_info.json
     """
     query = (
         """
@@ -95,3 +95,46 @@ async def get_items_tree_with_additional_info(
         return None
     tree: DbItemWithAddInfo = _tree
     return tree
+
+
+async def get_all_children_ids_by_item_id(item_id: str) -> list[str]:
+    """
+    example or query response:
+    {
+        "children_ids" : [
+            "863e1a7a-1304-42ae-943b-179184c077e3",
+            "b1d8fd7d-2ae3-47d5-b2f9-0f094af800d4"
+        ]
+    }
+    function returns [
+        "863e1a7a-1304-42ae-943b-179184c077e3",
+        "b1d8fd7d-2ae3-47d5-b2f9-0f094af800d4"
+    ]
+    or [] if there are no children
+    """
+    query = (
+        """
+        WITH RECURSIVE cte AS (
+            SELECT id AS root_id, id, parent_id
+            FROM items
+            WHERE items.id = '%s'
+                UNION ALL
+            SELECT cte.root_id, items.id, items.parent_id
+            FROM items
+            JOIN cte ON items.parent_id = cte.id
+        )
+        SELECT
+            json_build_object(
+                'chidlren_ids', array_agg(id)
+            ) as res
+        FROM cte
+        WHERE id <> root_id
+        GROUP BY root_id
+    """
+        % item_id
+    )
+    fetched_data = await database.fetch_all(query)
+    if not fetched_data or not (_res := json.loads(fetched_data[0].res)):
+        return []
+    res: list[str] = _res["children_ids"]
+    return res
