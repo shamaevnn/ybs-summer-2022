@@ -1,7 +1,10 @@
 import json
-from typing import Optional, Tuple
+import sqlalchemy as sa
+
+from typing import Optional
 
 from app.db.base import database
+from app.models.items.table_schema import items_table
 from app.types import DbItemWithAddInfo
 
 
@@ -138,3 +141,14 @@ async def get_all_children_ids_by_item_id(item_id: str) -> list[str]:
         return []
     res: list[str] = _res["children_ids"]
     return res
+
+
+async def cascade_delete_item_by_id(item_id: str) -> None:
+    query = items_table.delete().where(items_table.c.id == item_id)
+    await database.execute(query)
+
+
+async def check_if_item_exists(item_id: str) -> bool:
+    query = sa.select([items_table.c.id]).where(items_table.c.id == item_id)
+    res = await database.fetch_one(query)
+    return bool(res)
