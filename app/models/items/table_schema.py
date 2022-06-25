@@ -17,8 +17,9 @@ items_table = sa.Table(
     sa.ForeignKeyConstraint(
         ["parent_id"],
         ["items.id"],
+        ondelete="CASCADE",
         name="items_parent_id_f0ab547a_fk_items_id",
-        initially="DEFERRED",
-        deferrable=True,
+        # initially="DEFERRED",
+        # deferrable=True,
     ),
 )
