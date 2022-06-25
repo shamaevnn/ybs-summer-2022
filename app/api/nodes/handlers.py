@@ -1,6 +1,6 @@
 from typing import Optional, cast
 
-from app.models.items.handlers import get_items_tree_with_additional_info
+from app.models.items.queries import get_items_tree_with_additional_info
 from app.types import DbItemWithAddInfo, ItemType, ItemsOut
 
 
