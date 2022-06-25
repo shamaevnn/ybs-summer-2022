@@ -1,0 +1,109 @@
+{
+  "id": "069cb8d7-bbdd-47d3-ad8f-82ef4c269df1",
+  "lvl": 0,
+  "date": "2022-02-03T15:00:00+00:00",
+  "name": "Товары",
+  "type": "CATEGORY",
+  "price": null,
+  "children": [
+    {
+      "id": "d515e43f-f3f6-4471-bb77-6b455017a2d2",
+      "lvl": 1,
+      "date": "2022-02-02T12:00:00+00:00",
+      "name": "Смартфоны",
+      "type": "CATEGORY",
+      "price": null,
+      "children": [
+        {
+          "id": "b1d8fd7d-2ae3-47d5-b2f9-0f094af800d4",
+          "lvl": 2,
+          "date": "2022-02-02T12:00:00+00:00",
+          "name": "Xomia",
+          "type": "OFFER",
+          "price": 59999,
+          "children": null,
+          "parent_id": "d515e43f-f3f6-4471-bb77-6b455017a2d2",
+          "total_price": 0,
+          "total_offer_count": 0
+        },
+        {
+          "id": "863e1a7a-1304-42ae-943b-179184c077e3",
+          "lvl": 2,
+          "date": "2022-02-02T12:00:00+00:00",
+          "name": "jPhone 13",
+          "type": "OFFER",
+          "price": 79999,
+          "children": null,
+          "parent_id": "d515e43f-f3f6-4471-bb77-6b455017a2d2",
+          "total_price": 0,
+          "total_offer_count": 0
+        }
+      ],
+      "parent_id": "069cb8d7-bbdd-47d3-ad8f-82ef4c269df1",
+      "total_price": 139998,
+      "total_offer_count": 2
+    },
+    {
+      "id": "1cc0129a-2bfe-474c-9ee6-d435bf5fc8f2",
+      "lvl": 1,
+      "date": "2022-02-03T15:00:00+00:00",
+      "name": "Телевизоры",
+      "type": "CATEGORY",
+      "price": null,
+      "children": [
+        {
+          "id": "73bc3b36-02d1-4245-ab35-3106c9ee1c65",
+          "lvl": 2,
+          "date": "2022-02-03T15:00:00+00:00",
+          "name": "Goldstar",
+          "type": "OFFER",
+          "price": 69999,
+          "children": null,
+          "parent_id": "1cc0129a-2bfe-474c-9ee6-d435bf5fc8f2",
+          "total_price": 0,
+          "total_offer_count": 0
+        },
+        {
+          "id": "74b81fda-9cdc-4b63-8927-c978afed5cf4",
+          "lvl": 2,
+          "date": "2022-02-03T12:00:00+00:00",
+          "name": "Plyllis",
+          "type": "OFFER",
+          "price": 49999,
+          "children": null,
+          "parent_id": "1cc0129a-2bfe-474c-9ee6-d435bf5fc8f2",
+          "total_price": 0,
+          "total_offer_count": 0
+        },
+        {
+          "id": "98883e8f-0507-482f-bce2-2fb306cf6483",
+          "lvl": 2,
+          "date": "2022-02-03T12:00:00+00:00",
+          "name": "Samson",
+          "type": "OFFER",
+          "price": 32999,
+          "children": null,
+          "parent_id": "1cc0129a-2bfe-474c-9ee6-d435bf5fc8f2",
+          "total_price": 0,
+          "total_offer_count": 0
+        }
+      ],
+      "parent_id": "069cb8d7-bbdd-47d3-ad8f-82ef4c269df1",
+      "total_price": 152997,
+      "total_offer_count": 3
+    },
+    {
+      "id": "3bf49354-7a82-4433-9739-df59e1836786",
+      "lvl": 1,
+      "date": "2022-02-03T15:00:00+00:00",
+      "name": "Пустая",
+      "type": "CATEGORY",
+      "price": null,
+      "children": [],
+      "parent_id": "069cb8d7-bbdd-47d3-ad8f-82ef4c269df1"
+    }
+  ],
+  "parent_id": null,
+  "total_price": 292995,
+  "total_offer_count": 5
+}
