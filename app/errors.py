@@ -15,3 +15,10 @@ class NodeNotFound(HTTPException):
 
     def __init__(self, node_id: str) -> None:
         self.detail = f"Node with id={node_id} not found"
+
+
+class InvalidUUID(HTTPException):
+    status_code: int = 400
+
+    def __init__(self, uuid: str) -> None:
+        self.detail = f"Current {uuid=} is not valid"
