@@ -23,9 +23,16 @@ repos:
     -   id: black
         exclude: ^.*\b(migrations)\b.*$
 
-- repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v0.950
+- repo: local
   hooks:
     - id: mypy
       name: mypy
-      args: [--config-file, mypy.ini]
+      entry: "./.github/lint.sh check-mypy"
+      # use require_serial so that script
+      # is only called once per commit
+      require_serial: true
+      language: script
+      # Print the number of files as a sanity-check
+      verbose: true
+      pass_filenames: false
+      always_run: true
