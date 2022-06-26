@@ -9,6 +9,8 @@ Implemented methods:
 * `POST` import item, update if exists, tests ✅
 * `GET` item sale **statistics**, tests ✅
 
+All of them are available [here](https://github.com/shamaevnn/ybs-summer-2022/tree/master/app/api), in `routes.py` particularly.
+
 <img width="592" alt="Screenshot 2022-06-26 at 23 14 57" src="https://user-images.githubusercontent.com/50623190/175832316-10f8f223-c35a-4369-83bf-d8a2d0a2a060.png">
 
 ## Used Technologies
