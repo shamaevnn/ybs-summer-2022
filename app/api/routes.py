@@ -1,9 +1,16 @@
-from fastapi import APIRouter, Query
+import traceback
+from dataclasses import asdict
+from datetime import datetime
+from uuid import UUID
+
+from fastapi import APIRouter, Body, HTTPException, Query
 from starlette.responses import RedirectResponse
 
-from app.api.items.handlers import RecursiveSQLOnlyItems
-from app.errors import NodeNotFound, InvalidUUID
-from app.models.items.queries import check_if_item_exists, cascade_delete_item_by_id
+from app.api import descriptions
+from app.api.items.handlers import ImportItemsManager, RecursiveSQLOnlyItems
+from app.errors import InvalidUUID, NodeNotFound
+from app.models.items.queries import cascade_delete_item_by_id, check_if_item_exists
+from app.schemas import DictExampleImportItem, ImportItem, ImportItemsIn
 from app.types import ItemsOut
 from app.utils import is_valid_uuid
 
@@ -15,46 +22,70 @@ async def docs_redirect() -> RedirectResponse:
     return RedirectResponse(url="/docs")
 
 
-@api_router.get(
-    "/nodes",
-    description="Получить информацию об элементе по идентификатору."
-    " При получении информации о категории также предоставляется информация о её дочерних элементах.",  # noqa
-)
+@api_router.get("/nodes", description=descriptions.get_nodes)
 async def get_nodes_with_children_by_id(
-    id: str = Query(
+    id: UUID = Query(
         ...,
         example="3fa85f64-5717-4562-b3fc-2c963f66a333",
         description="Идентификатор элемента",
     ),
 ) -> ItemsOut:
-    if not is_valid_uuid(id):
-        raise InvalidUUID(uuid=id)
+    str_id = str(id)
+    if not is_valid_uuid(str_id):
+        raise InvalidUUID(uuid=str_id)
 
-    recursive_nodes = RecursiveSQLOnlyItems(start_item_id=id)
+    recursive_nodes = RecursiveSQLOnlyItems(start_item_id=str_id)
     nodes = await recursive_nodes.get()
     if not nodes:
-        raise NodeNotFound(node_id=id)
+        raise NodeNotFound(node_id=str_id)
 
     return nodes
 
 
 @api_router.get(
     "/delete",
-    description="Удалить элемент по идентификатору."
-    " При удалении категории удаляются все дочерние элементы."
-    " Доступ к статистике (истории обновлений) удаленного элемента невозможен.",
+    description=descriptions.delete_node,
 )
 async def delete_item_by_id(
-    id: str = Query(
+    id: UUID = Query(
         ...,
-        example="3fa85f64-5717-4562-b3fc-2c963f66a333",
+        example="74b81fda-9cdc-4b63-8927-c978afed5cf4",
         description="Идентификатор элемента",
     ),
 ) -> None:
-    if not is_valid_uuid(id):
-        raise InvalidUUID(uuid=id)
+    str_id = str(id)
 
-    if not await check_if_item_exists(id):
-        raise NodeNotFound(node_id=id)
+    if not is_valid_uuid(str_id):
+        raise InvalidUUID(uuid=str_id)
 
-    await cascade_delete_item_by_id(id)
+    if not await check_if_item_exists(str_id):
+        raise NodeNotFound(node_id=str_id)
+
+    await cascade_delete_item_by_id(str_id)
+
+
+@api_router.post(
+    "/imports",
+    description=descriptions.imports,
+)
+async def import_items(
+    updateDate: datetime = Body(...),
+    items: list[DictExampleImportItem] = Body(...),
+) -> None:
+    try:
+        validated = ImportItemsIn(
+            items=[ImportItem(**asdict(item)) for item in items],
+            updateDate=updateDate,
+        )
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    else:
+        items_to_import = ImportItemsManager(
+            items_to_import=validated.items,
+            update_date=validated.updateDate,
+        )
+        await items_to_import.import_to_db()

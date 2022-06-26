@@ -1,11 +1,14 @@
 import json
-import sqlalchemy as sa
+from typing import Iterable, Optional, Union
+from uuid import UUID
 
-from typing import Optional
+import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.sql.functions import count
 
 from app.db.base import database
 from app.models.items.table_schema import items_table
-from app.types import DbItemWithAddInfo
+from app.types import DbItem, DbItemWithAddInfo, ImportItemToDb, ItemType
 
 
 async def get_items_tree_with_additional_info(
@@ -152,3 +155,61 @@ async def check_if_item_exists(item_id: str) -> bool:
     query = sa.select([items_table.c.id]).where(items_table.c.id == item_id)
     res = await database.fetch_one(query)
     return bool(res)
+
+
+async def get_items(item_ids: list[str]) -> list[DbItem]:
+    query = sa.select(*[items_table.c]).where(items_table.c.id.in_(tuple(item_ids)))
+    fetched_data = await database.fetch_all(query)
+    if not fetched_data:
+        return []
+    return [DbItem(**item) for item in fetched_data]
+
+
+async def count_elements_with_ids(item_ids: list[str]) -> int:
+    query = sa.select([count(items_table.c.id)]).where(
+        items_table.c.id.in_(tuple(item_ids))
+    )
+    fetched_data = await database.fetch_one(query)
+    if not fetched_data:
+        return 0
+    res: int = fetched_data[0]
+    return res
+
+
+async def get_items_by_ids_and_type(item_ids: list[str], item_type: str) -> list[DbItem]:
+    query = sa.select(*[items_table.c]).where(
+        sa.and_(
+            *[
+                items_table.c.id.in_(tuple(item_ids)),
+                items_table.c.type == item_type,
+            ]
+        )
+    )
+    fetched_data = await database.fetch_all(query)
+    if not fetched_data:
+        return []
+    return [DbItem(**item) for item in fetched_data]
+
+
+async def filter_ids_in_db(item_ids: Iterable[str]) -> list[str]:
+    query = sa.select([items_table.c.id]).where(items_table.c.id.in_(tuple(item_ids)))
+    fetched_data = await database.fetch_all(query)
+    if not fetched_data:
+        return []
+    return [str(row.id) for row in fetched_data]
+
+
+async def upsert_items(items: list[ImportItemToDb]) -> None:
+    stmt = insert(items_table)
+    query = stmt.on_conflict_do_update(
+        constraint="items_pkey",
+        # The columns that should be updated on conflict
+        set_={
+            # dont include type
+            "name": stmt.excluded.name,
+            "price": stmt.excluded.price,
+            "parent_id": stmt.excluded.parent_id,
+            "date": stmt.excluded.date,
+        },
+    )
+    await database.execute_many(query=query, values=items)

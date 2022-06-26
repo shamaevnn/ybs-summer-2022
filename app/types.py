@@ -1,7 +1,14 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
 from typing import Optional, TypedDict
+
+
+class ItemType(str, Enum):
+    offer = "OFFER"
+    category = "CATEGORY"
 
 
 class DbItemWithAddInfo(TypedDict):
@@ -29,6 +36,20 @@ class ItemsOut(TypedDict):
     children: Optional[list["ItemsOut"]]  # type: ignore
 
 
-class ItemType(str, Enum):
-    offer = "OFFER"
-    category = "CATEGORY"
+@dataclass
+class DbItem:
+    id: str
+    name: str
+    type: ItemType
+    date: str
+    price: Optional[int] = None
+    parent_id: Optional[str] = None
+
+
+class ImportItemToDb(TypedDict):
+    id: str
+    date: datetime
+    name: str
+    type: str
+    parent_id: Optional[str]
+    price: Optional[int]

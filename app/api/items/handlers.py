@@ -1,7 +1,14 @@
+from datetime import datetime
 from typing import Optional, cast
 
-from app.models.items.queries import get_items_tree_with_additional_info
-from app.types import DbItemWithAddInfo, ItemType, ItemsOut
+from app.api.items.checks import AsyncChecks
+from app.models.items.queries import (
+    filter_ids_in_db,
+    get_items_tree_with_additional_info,
+    upsert_items,
+)
+from app.schemas import ImportItem
+from app.types import DbItemWithAddInfo, ImportItemToDb, ItemsOut, ItemType
 
 
 class RecursiveSQLOnlyItems:
@@ -60,6 +67,83 @@ class RecursiveSQLOnlyItems:
             return None
         db_tree: ItemsOut = self._set_price_and_del_ambiguous_values(_db_tree)
         return db_tree
+
+
+class ImportItemsManager:
+    def __init__(self, items_to_import: list[ImportItem], update_date: datetime):
+        self.items_to_import = items_to_import
+        self.update_date = update_date
+        self._all_import_items_by_id: Optional[dict[str, ImportItem]] = None
+        self._ids_already_in_db: Optional[list[str]] = None
+
+    async def __prepare_data(self) -> None:
+        self._all_import_items_by_id = {}
+        all_ids = set()
+        for item in self.items_to_import:
+            self._all_import_items_by_id[str(item.id)] = item
+            if item.parentId:
+                _all_ids = {str(item.id), str(item.parentId)}
+            else:
+                _all_ids = {str(item.id)}
+            all_ids.update(_all_ids)
+        self._ids_already_in_db = await filter_ids_in_db(all_ids)
+
+    def _get_item_to_upload(self, item: ImportItem) -> ImportItemToDb:
+        item_dict = item.dict()
+        res: ImportItemToDb = ImportItemToDb(  # type:ignore
+            date=self.update_date, parent_id=item_dict.pop("parentId"), **item_dict
+        )
+        return res
+
+    def _get_items_to_upload(self) -> list[ImportItemToDb]:
+        """
+        returns data_to_upload -- list of dictionaries
+
+        Go through all import items
+        If parent not in database, but in list of imports,
+           then upload parent and then initial item
+        elif in database, then
+        """
+        assert self._ids_already_in_db is not None
+        assert self._all_import_items_by_id is not None
+
+        data_to_upload: list[ImportItemToDb] = []
+        ids_uploaded: list[str] = []
+        for import_item in self.items_to_import:
+            item_id = str(import_item.id)
+            if item_id in ids_uploaded:
+                continue
+
+            if import_item.parentId is not None and (
+                parent_id := str(import_item.parentId)
+            ):
+                if parent_id in self._ids_already_in_db:
+                    data_to_upload.append(self._get_item_to_upload(import_item))
+                    ids_uploaded.append(item_id)
+                else:  # parent in batch of imports
+                    if (
+                        parent_id not in ids_uploaded
+                    ):  # if not added parent to data to upload yet
+                        parent_item = self._all_import_items_by_id[parent_id]
+                        data_to_upload.append(self._get_item_to_upload(parent_item))
+                        ids_uploaded.append(parent_id)
+                    data_to_upload.append(self._get_item_to_upload(import_item))
+                    ids_uploaded.append(item_id)
+            else:
+                data_to_upload.append(self._get_item_to_upload(import_item))
+                ids_uploaded.append(item_id)
+
+        del ids_uploaded
+        return data_to_upload
+
+    async def import_to_db(self) -> None:
+        async_checks = AsyncChecks(items=self.items_to_import)
+        await async_checks.check()
+
+        await self.__prepare_data()
+
+        items_to_upload = self._get_items_to_upload()
+        await upsert_items(items=items_to_upload)
 
 
 # class RecursiveSQLWithPythonItems:
