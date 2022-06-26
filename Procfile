@@ -1,2 +1,2 @@
-release: python alembic upgrade head
+release: make migrate
 web: uvicorn main:app --host 0.0.0.0 --port $PORT
