@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.descriptions import API_description
 from app.api.routes import api_router
 from app.core.config import get_app_settings
 from app.core.events import create_start_app_handler, create_stop_app_handler
@@ -9,7 +10,9 @@ from app.core.events import create_start_app_handler, create_stop_app_handler
 def get_application() -> FastAPI:
     settings = get_app_settings()
 
-    application = FastAPI(**settings.fastapi_kwargs)
+    application = FastAPI(
+        **dict(version="1.0.0", description=API_description, **settings.fastapi_kwargs)
+    )
 
     application.add_middleware(
         CORSMiddleware,

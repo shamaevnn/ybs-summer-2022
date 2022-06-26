@@ -14,3 +14,11 @@ imports = """
 Товары/категории импортированные повторно обновляют текущие.
 Изменение типа элемента с товара на категорию или с категории на товар не допускается.
 """
+
+
+API_description = """
+These endpoints allow you to:
+ * GET info about item with **all it's children**
+ * POST many items at once
+ * DELETE items and all **all it's children**
+"""

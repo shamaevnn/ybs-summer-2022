@@ -14,7 +14,7 @@ from app.schemas import DictExampleImportItem, ImportItem, ImportItemsIn
 from app.types import ItemsOut
 from app.utils import is_valid_uuid
 
-api_router = APIRouter()
+api_router = APIRouter(tags=["Default items endpoints"])
 
 
 @api_router.get("/", include_in_schema=False)

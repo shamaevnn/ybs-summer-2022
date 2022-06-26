@@ -12,13 +12,11 @@ class AppSettings(BaseAppSettings):
     openapi_prefix: str = ""
     openapi_url: str = "/openapi.json"
     redoc_url: str = "/redoc"
-    title: str = "FastAPI example application"
+    title: str = "Mega Market via FASTApi"
 
     database_url: Union[str, PostgresDsn]
     max_connection_count: int = 10
     min_connection_count: int = 10
-
-    api_prefix: str = "/v1"
 
     allowed_hosts: List[str] = ["*"]
 
