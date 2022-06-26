@@ -10,6 +10,8 @@ from app.models.items.queries import (
     get_items_tree_with_additional_info,
     upsert_items,
     check_if_item_exists,
+    get_all_parent_ids_by_item_id,
+    update_date,
 )
 from app.models.items_statistic.queries import save_import_items_to_statistic
 from app.schemas import ImportItem
@@ -122,7 +124,7 @@ class ImportItemsManager:
 
     async def _get_items_to_upload(
         self,
-    ) -> Tuple[list[ImportItemToDb], list[ImportStatsItemToDb]]:
+    ) -> Tuple[list[ImportItemToDb], list[ImportStatsItemToDb], list[str]]:
         """
         returns data_to_upload -- list of dictionaries
 
@@ -136,6 +138,7 @@ class ImportItemsManager:
 
         data_to_upload: list[ImportItemToDb] = []
         stats_data_to_upload: list[ImportStatsItemToDb] = []
+        all_parent_ids_of_offers: list[str] = []
         ids_uploaded: list[str] = []
         for import_item in self.items_to_import:
             item_id = str(import_item.id)
@@ -144,6 +147,9 @@ class ImportItemsManager:
 
             if import_item.type == ItemType.offer.value:
                 # save to statistic table
+                all_parent_ids_of_offers.extend(
+                    await get_all_parent_ids_by_item_id(item_id)
+                )
                 stats_data_to_upload.append(self._get_stat_item_to_upload(import_item))
 
             if import_item.parentId is not None and (
@@ -166,7 +172,7 @@ class ImportItemsManager:
                 ids_uploaded.append(item_id)
 
         del ids_uploaded
-        return data_to_upload, stats_data_to_upload
+        return data_to_upload, stats_data_to_upload, all_parent_ids_of_offers
 
     async def import_to_db(self) -> None:
         async_checks = AsyncChecks(items=self.items_to_import)
@@ -174,10 +180,17 @@ class ImportItemsManager:
 
         await self.__prepare_data()
 
-        items_to_upload, stats_items_to_upload = await self._get_items_to_upload()
+        (
+            items_to_upload,
+            stats_items_to_upload,
+            all_parent_ids_of_offers,
+        ) = await self._get_items_to_upload()
         async with database.transaction():
             await upsert_items(items=items_to_upload)
             await save_import_items_to_statistic(items=stats_items_to_upload)
+            await update_date(
+                item_ids=all_parent_ids_of_offers, new_update_date=self.update_date
+            )
 
 
 # class RecursiveSQLWithPythonItems:

@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from typing import Iterable, Optional
 
 import sqlalchemy as sa
@@ -143,6 +144,49 @@ async def get_all_children_ids_by_item_id(item_id: str) -> list[str]:
         return []
     res: list[str] = _res["children_ids"]
     return res
+
+
+async def get_all_parent_ids_by_item_id(item_id: str) -> list[str]:
+    query = (
+        """
+    WITH RECURSIVE cte AS (
+        SELECT id AS root_id, id, parent_id
+        FROM items
+        WHERE items.id = '%s'
+            UNION ALL
+        SELECT cte.root_id, items.id, items.parent_id
+        FROM items
+        JOIN cte ON items.id = cte.parent_id
+    )
+    SELECT
+        json_build_object(
+            'parent_ids', array_agg(id)
+        ) as res
+    FROM cte
+    WHERE id <> root_id
+    GROUP BY root_id;
+    """
+        % item_id
+    )
+
+    fetched_data = await database.fetch_all(query)
+    if not fetched_data or not (_res := json.loads(fetched_data[0].res)):
+        return []
+    res: list[str] = _res["parent_ids"]
+    return res
+
+
+async def update_date(item_ids: list[str], new_update_date: datetime) -> None:
+    query = (
+        items_table.update()
+        .where(items_table.c.id.in_(tuple(item_ids)))
+        .values(
+            {
+                "date": new_update_date,
+            }
+        )
+    )
+    await database.execute(query)
 
 
 async def cascade_delete_item_by_id(item_id: str) -> None:
