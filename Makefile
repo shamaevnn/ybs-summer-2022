@@ -15,7 +15,7 @@ downgrade:
 	PYTHONPATH=. alembic downgrade head-1
 
 dev:
-	uvicorn main:app --host 0.0.0.0 --reload
+	uvicorn main:app --host 0.0.0.0 --port 80 --reload
 
 psql:
 	psql -h localhost -U postgres -d postgres
