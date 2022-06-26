@@ -29,4 +29,5 @@ These endpoints allow you to:
  * GET info about item with **all it's children**
  * POST many items at once
  * DELETE items and all **all it's children**
+ * GET list of items for which price has changed in from [date - 24h, date]
 """
