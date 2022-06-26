@@ -21,6 +21,10 @@ postgres to get item and all it's children recursively.
 * Linters: `mypy`, `flake8`, `black`
 * `GitHub Actions` for deployment
 
+## Database
+This solution uses only 2 tables: [items](https://github.com/shamaevnn/ybs-summer-2022/blob/master/app/models/items/table_schema.py) for 3 main endpoints
+and [items_statistic](https://github.com/shamaevnn/ybs-summer-2022/blob/master/app/models/items_statistic/table_schema.py) for statistic endpoint
+
 
 ## First run
 1. Clone repo
@@ -61,12 +65,12 @@ make dev
 4.Check http://0.0.0.0/docs, everything should be OK!
 
 
-## tests
+## Tests
 ```
 python3 tests/test_default.py
 ```
 
-## linter
+## Linter
 ```
 make lint
 ```
