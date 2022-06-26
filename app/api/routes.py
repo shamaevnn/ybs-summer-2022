@@ -15,8 +15,8 @@ from app.schemas import (
     DictExampleImportItem,
     ImportItem,
     ImportItemsIn,
-    StatsItems,
     SaleStatsDateIn,
+    StatsItems,
 )
 from app.types import ItemsOut
 from app.utils import is_valid_uuid

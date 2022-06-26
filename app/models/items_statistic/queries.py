@@ -1,13 +1,12 @@
 import json
 import uuid
-
 from datetime import datetime, timedelta
 
 from sqlalchemy.dialects.postgresql import insert
 
 from app.db.base import database
 from app.models.items_statistic.table_schema import items_statistic_table
-from app.schemas import StatsItems, StatsItem, ImportItem
+from app.schemas import ImportItem, StatsItem, StatsItems
 from app.types import ImportStatsItemToDb
 
 
