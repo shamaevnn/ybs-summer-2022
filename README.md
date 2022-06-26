@@ -1,6 +1,13 @@
 # Mega Market Backend
-## Made by [@shamaevnn](https://t.me/shamaevnn)
+### Made by [@shamaevnn](https://t.me/shamaevnn)
 Solving practical part of task.
+
+
+Implemented methods:
+* `GET` nodes with children. It's made with **ONLY ONE** SQL request. Tests are passed ✅
+* `DELETE` item with all corresponding items, tests ✅
+* `POST` import item, update if exists, tests ✅
+* `GET` item sale **statistics**, tests ✅
 
 
 ## First run
@@ -36,3 +43,14 @@ make services
 make dev
 ```
 3. Check http://0.0.0.0/docs, everything should be OK!
+
+
+## tests
+```
+python3 tests/test_default.py
+```
+
+## linter
+```
+make lint
+```
