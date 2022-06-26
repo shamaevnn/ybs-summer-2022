@@ -38,11 +38,15 @@ cp .env_example .env
 ```bash
 make services
 ```
-2. Run backend on FastAPI
+2. Apply migrations
+```
+make migrate
+```
+3.Run backend on FastAPI
 ```
 make dev
 ```
-3. Check http://0.0.0.0/docs, everything should be OK!
+4.Check http://0.0.0.0/docs, everything should be OK!
 
 
 ## tests
