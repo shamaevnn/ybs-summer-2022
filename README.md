@@ -1,5 +1,6 @@
 # Mega Market Backend
-Решение практической части задания 
+## Made by [@shamaevnn](https://t.me/shamaevnn)
+Решение практической части задания
 
 
 ## Установка `pre-commit` хуков
