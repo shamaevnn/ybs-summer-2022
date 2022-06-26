@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Optional, Union
 from uuid import UUID
 
+from fastapi import HTTPException
 from pydantic import BaseModel, root_validator, validator
 
 from app.types import ItemType
@@ -71,3 +72,29 @@ class ImportItemsIn(BaseModel):
         item_ids = [item.id for item in items]
         cls._validate_all_item_ids_are_unique(item_ids)
         return items
+
+
+class SaleStatsDateIn(BaseModel):
+    date: str
+
+    @validator("date")
+    def validate_date(cls, date: str) -> datetime:
+        date_fmt = "%Y-%m-%dT%H:%M:%S.000Z"
+        return datetime.strptime(date, date_fmt)
+
+
+class StatsItem(BaseModel):
+    id: str
+    name: str
+    price: int
+    parentId: Optional[str] = None
+    type: ItemType
+    date: str
+
+    @validator("date")
+    def validate_date(cls, date: str) -> str:
+        return date.replace("+00:00", ".000Z")
+
+
+class StatsItems(BaseModel):
+    items: list[StatsItem]

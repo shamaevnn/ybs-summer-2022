@@ -54,3 +54,13 @@ class ImportItemToDb(TypedDict):
     type: str
     parent_id: Optional[str]
     price: Optional[int]
+
+
+class ImportStatsItemToDb(TypedDict):
+    stat_id: str
+    id: str
+    name: str
+    price: int
+    parent_id: Optional[str]
+    type: str
+    date: datetime

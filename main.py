@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.descriptions import API_description
-from app.api.routes import api_router
+from app.api.routes import api_router, statistic_api_router
 from app.core.config import get_app_settings
 from app.core.events import create_start_app_handler, create_stop_app_handler
 
@@ -31,6 +31,7 @@ def get_application() -> FastAPI:
         create_stop_app_handler(),
     )
     application.include_router(api_router)
+    application.include_router(statistic_api_router)
 
     return application
 
