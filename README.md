@@ -13,7 +13,8 @@ Implemented methods:
 
 ## Used Technologies
 * Python with `FastAPI` for backend
-* Database: `PostgreSQL`. Just have a look at this [AMAZING QUERY](https://github.com/shamaevnn/ybs-summer-2022/blob/master/app/models/items/queries.py#L14) 👀 via postgres
+* Database: `PostgreSQL`. Just have a look at this [AMAZING QUERY](https://github.com/shamaevnn/ybs-summer-2022/blob/master/app/models/items/queries.py#L14) 👀 via
+postgres to get item and all it's children recursively.
 * Data validation: `Pydantic`
 * Linters: `mypy`, `flake8`, `black`
 * `GitHub Actions` for deployment
@@ -70,5 +71,8 @@ make lint
 
 
 ## Deployment info
-This app is deployed via [dokku](https://dokku.com/) -- free version of Heroku.
+This app is deployed via [dokku](https://dokku.com/) -- free open-source version of Heroku.
 Unfortunately, I haven't managed to deploy it to Yandex servers. Probably, because of VPN.
+
+* Push or pull request to any branch triggers `checks.yml` github action with linters
+* Push to `master` begins deployment process
