@@ -2,10 +2,12 @@ from datetime import datetime
 from typing import Optional, cast
 
 from app.api.items.checks import AsyncChecks
+from app.errors import NodeNotFound
 from app.models.items.queries import (
     filter_ids_in_db,
     get_items_tree_with_additional_info,
     upsert_items,
+    check_if_item_exists,
 )
 from app.schemas import ImportItem
 from app.types import DbItemWithAddInfo, ImportItemToDb, ItemsOut, ItemType
@@ -34,6 +36,8 @@ class RecursiveSQLOnlyItems:
     def _set_price_and_del_ambiguous_values(
         cls, curr_tree: DbItemWithAddInfo
     ) -> ItemsOut:
+        curr_tree["parentId"] = curr_tree["parent_id"]
+        curr_tree["date"] = curr_tree["date"].replace("+00:00", ".000Z")
         if curr_tree["type"] == ItemType.offer.value:
             # offer already has price
             cls.__delete_keys_values(curr_tree)
@@ -59,12 +63,14 @@ class RecursiveSQLOnlyItems:
         curr_tree["children"] = new_children
         return cast(ItemsOut, curr_tree)
 
-    async def get(self) -> Optional[ItemsOut]:
+    async def get(self) -> ItemsOut:
+        if not (await check_if_item_exists(self.start_item_id)):
+            raise NodeNotFound(node_id=self.start_item_id)
+
         _db_tree: Optional[DbItemWithAddInfo] = await get_items_tree_with_additional_info(
             self.start_item_id
         )
-        if not _db_tree:
-            return None
+        assert _db_tree is not None
         db_tree: ItemsOut = self._set_price_and_del_ambiguous_values(_db_tree)
         return db_tree
 

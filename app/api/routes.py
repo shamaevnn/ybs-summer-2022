@@ -1,4 +1,3 @@
-import traceback
 from dataclasses import asdict
 from datetime import datetime
 from uuid import UUID
@@ -22,7 +21,7 @@ async def docs_redirect() -> RedirectResponse:
     return RedirectResponse(url="/docs")
 
 
-@api_router.get("/nodes", description=descriptions.get_nodes)
+@api_router.get("/nodes/{id}", description=descriptions.get_nodes)
 async def get_nodes_with_children_by_id(
     id: UUID = Query(
         ...,
@@ -36,14 +35,12 @@ async def get_nodes_with_children_by_id(
 
     recursive_nodes = RecursiveSQLOnlyItems(start_item_id=str_id)
     nodes = await recursive_nodes.get()
-    if not nodes:
-        raise NodeNotFound(node_id=str_id)
 
     return nodes
 
 
-@api_router.get(
-    "/delete",
+@api_router.delete(
+    "/delete/{id}",
     description=descriptions.delete_node,
 )
 async def delete_item_by_id(

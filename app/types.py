@@ -16,6 +16,7 @@ class DbItemWithAddInfo(TypedDict):
     date: str
     name: str
     type: str
+    parent_id: Optional[str]
     parentId: Optional[str]
     price: Optional[int]
     children: Optional[list[DbItemWithAddInfo]]  # type: ignore

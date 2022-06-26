@@ -1,6 +1,5 @@
 import json
-from typing import Iterable, Optional, Union
-from uuid import UUID
+from typing import Iterable, Optional
 
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
@@ -8,7 +7,7 @@ from sqlalchemy.sql.functions import count
 
 from app.db.base import database
 from app.models.items.table_schema import items_table
-from app.types import DbItem, DbItemWithAddInfo, ImportItemToDb, ItemType
+from app.types import DbItem, DbItemWithAddInfo, ImportItemToDb
 
 
 async def get_items_tree_with_additional_info(
@@ -20,11 +19,11 @@ async def get_items_tree_with_additional_info(
     query = (
         """
         WITH RECURSIVE c AS (
-            SELECT *, parent_id as parentId, 0 as lvl
+            SELECT *, 0 as lvl
             FROM   items
             WHERE  items.id = '%s'
                 UNION ALL
-            SELECT items.*, items.parent_id as parentId, c.lvl + 1
+            SELECT items.*, c.lvl + 1
             FROM   items
             JOIN   c ON items.parent_id = c.id
         ),
