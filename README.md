@@ -62,12 +62,12 @@ make migrate
 ```
 make dev
 ```
-4.Check http://0.0.0.0/docs, everything should be OK!
+4.Check http://0.0.0.0:80/docs, everything should be OK!
 
 
 ## Tests
 ```
-python3 tests/test_default.py
+make run_tests
 ```
 
 ## Linter
@@ -80,9 +80,13 @@ make lint
 Deploy to production via `GitHub Actions` consists of 3 steps:
 1. Check all linters via pre-commit, it runs on any branch/pull request.
 
+<img width="925" alt="Screenshot 2022-06-27 at 20 44 38" src="https://user-images.githubusercontent.com/50623190/176004430-a3371a91-a8f4-4ee9-9e83-cfa65e6ac4f0.png">
+
 If it's success, then:
-2. Login to github registry, build and push docker image to there.
+2. Login to github registry, build and push docker image.
 3. Go to server via ssh and VPN, pull built docker image, stop old ones, start new one.
+
+<img width="984" alt="Screenshot 2022-06-27 at 20 48 49" src="https://user-images.githubusercontent.com/50623190/176004515-56833876-7c21-4352-a6be-c68775867df6.png">
 
 ---
 
