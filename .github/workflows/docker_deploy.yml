@@ -1,4 +1,4 @@
-name: "deploy"
+name: "docker_deploy"
 
 on:
   push:
@@ -24,9 +24,6 @@ jobs:
       - name: docker build
         run: |
           docker build . -t ghcr.io/shamaevnn/ybs-summer-2022:latest
-      - name: mypy check
-        run: |
-          docker run ghcr.io/shamaevnn/ybs-summer-2022 /bin/bash -c "pip install -r requirements.dev.txt && pip install -r requirements.txt && mypy --config ./mypy.ini ."
       - name: docker push
         run: |
           docker push ghcr.io/shamaevnn/ybs-summer-2022:latest
@@ -38,5 +35,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: >
-            docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest &&
-            docker service update --image $(docker inspect --type image --format '{{index .RepoDigests 0}}' ghcr.io/shamaevnn/ybs-summer-2022:latest)
+            sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest &&
+            sudo docker service update --image $(docker inspect --type image --format '{{index .RepoDigests 0}}' ghcr.io/shamaevnn/ybs-summer-2022:latest)
