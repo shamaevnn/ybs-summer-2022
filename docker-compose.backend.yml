@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  web:
+    build: .
+    container_name: ybs_backend
+    restart: always
+    ports:
+      - 80:80
+    env_file:
+      - ./.env
+    volumes:
+      - .:/code

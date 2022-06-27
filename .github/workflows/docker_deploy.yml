@@ -57,9 +57,11 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: >
-            sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest &&
-            sudo docker service update --image $(sudo docker inspect --type image --format '{{index .RepoDigests 0}}' ghcr.io/shamaevnn/ybs-summer-2022:latest) ybs_backend --with-registry-auth
+          script: |
+            sudo docker compose -f docker-compose.backend.yml -p backend pull
+            sudo docker compose -f docker-compose.backend.yml -p backend up -d --build
+#            sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest &&
+#            sudo docker service update --image $(sudo docker inspect --type image --format '{{index .RepoDigests 0}}' ghcr.io/shamaevnn/ybs-summer-2022:latest) ybs_backend --with-registry-auth
 #            sudo echo $TOKEN_GITHUB &&
 #            sudo docker login ghcr.io -u shamaevnn --password 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
 

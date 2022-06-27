@@ -135,3 +135,4 @@ dmypy.json
 
 #Docker
 .Dockerfile.swp
+postgres_data/
