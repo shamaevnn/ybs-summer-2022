@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   web:
-    build: .
+    image: ghcr.io/shamaevnn/ybs-summer-2022:latest
     container_name: ybs_backend
     restart: always
     ports:
