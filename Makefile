@@ -25,7 +25,7 @@ format:
 	./.github/lint.sh format
 
 run_tests:
-	pytest .
+	pytest -v -s --color=yes --log-level=INFO .
 
 mypy:
 	chmod +x ./.github/lint.sh

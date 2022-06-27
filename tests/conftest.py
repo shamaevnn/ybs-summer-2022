@@ -1,18 +1,29 @@
+import asyncio
 import os
 import uuid
+import pytest
 from argparse import Namespace
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Union
+from typing import Union, AsyncGenerator
 from alembic.config import Config
 
 
-import pytest
+from fastapi import FastAPI
 from sqlalchemy_utils import create_database, drop_database
 from yarl import URL
 
+from app.core.http import http_cli_close
+from app.db.events import connect_to_db, close_db_connection
+from main import app as main_app
+
 
 PROJECT_PATH = Path(__file__).parent.parent.resolve()
+
+
+@pytest.fixture(scope="session")
+def event_loop() -> asyncio.AbstractEventLoop:
+    return asyncio.get_event_loop()
 
 
 def make_alembic_config(
@@ -40,17 +51,6 @@ def make_alembic_config(
     return config
 
 
-@pytest.fixture()
-def alembic_config(postgres):
-    """
-    Создает объект с конфигурацией для alembic, настроенный на временную БД.
-    """
-    cmd_options = SimpleNamespace(
-        config="alembic.ini", name="alembic", pg_url=postgres, raiseerr=False, x=None
-    )
-    return make_alembic_config(cmd_options)
-
-
 @pytest.fixture
 def postgres():
     """
@@ -65,3 +65,25 @@ def postgres():
         yield tmp_url
     finally:
         drop_database(tmp_url)
+
+
+@pytest.fixture()
+def alembic_config(postgres):
+    """
+    Создает объект с конфигурацией для alembic, настроенный на временную БД.
+    """
+    cmd_options = SimpleNamespace(
+        config="alembic.ini", name="alembic", pg_url=postgres, raiseerr=False, x=None
+    )
+    return make_alembic_config(cmd_options)
+
+
+@pytest.fixture(scope="module")
+async def app() -> AsyncGenerator[FastAPI, None]:
+    try:
+        await connect_to_db()
+        await connect_to_db()
+        yield main_app
+    finally:
+        await close_db_connection()
+        await http_cli_close()
