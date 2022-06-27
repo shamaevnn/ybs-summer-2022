@@ -35,27 +35,28 @@ jobs:
       - name: Check Connect VPN
         run: echo "status of open vpn " ${{ steps.connect_vpn.outputs.STATUS }}
 
+      - name: docker login
+        env:
+          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
+        run: |
+          echo $TOKEN_GITHUB | docker login ghcr.io -u shamaevnn --password-stdin
+      - name: docker build
+        run: |
+          docker build . -t ghcr.io/shamaevnn/ybs-summer-2022:latest
+      - name: docker push
+        run: |
+          docker push ghcr.io/shamaevnn/ybs-summer-2022:latest
+      - name: deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: '10.22.2.152'
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: sudo whoami
+
       - name: kill vpn
         if: always()
         run: sudo killall openvpn
-#      - name: docker login
-#        env:
-#          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
-#        run: |
-#          echo $TOKEN_GITHUB | docker login ghcr.io -u shamaevnn --password-stdin
-#      - name: docker build
-#        run: |
-#          docker build . -t ghcr.io/shamaevnn/ybs-summer-2022:latest
-#      - name: docker push
-#        run: |
-#          docker push ghcr.io/shamaevnn/ybs-summer-2022:latest
-#      - name: deploy
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: '10.22.2.152'
-#          username: ubuntu
-#          key: ${{ secrets.SSH_PRIVATE_KEY }}
-#          script: sudo whoami
 #          script: >
 #            sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest &&
 #            sudo docker service update --image $(docker inspect --type image --format '{{index .RepoDigests 0}}' ghcr.io/shamaevnn/ybs-summer-2022:latest)
