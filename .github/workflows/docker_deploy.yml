@@ -8,6 +8,9 @@ on:
 #    workflows: [ "checks" ]
 #    types: [ completed ]
 
+env:
+  TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -36,8 +39,8 @@ jobs:
         run: echo "status of open vpn " ${{ steps.connect_vpn.outputs.STATUS }}
 
       - name: docker login
-        env:
-          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
+#        env:
+#          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
         run: |
           echo $TOKEN_GITHUB | docker login ghcr.io -u shamaevnn --password-stdin
       - name: docker build
@@ -48,16 +51,18 @@ jobs:
           docker push ghcr.io/shamaevnn/ybs-summer-2022:latest
       - name: deploy
         uses: appleboy/ssh-action@master
-        env:
-          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
+#        env:
+#          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: >
-            echo $TOKEN_GITHUB | docker login ghcr.io -u shamaevnn --password-stdin
+            sudo echo $TOKEN_GITHUB &&
+            sudo docker login ghcr.io -u shamaevnn --password $TOKEN_GITHUB
 #            sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest &&
-#            sudo docker service update --image $(sudo docker inspect --type image --format '{{index .RepoDigests 0}}' ghcr.io/shamaevnn/ybs-summer-2022:latest) ybs_backend --with-registry-auth
+#            sudo docker service update --image $(sudo docker inspect --type image --format '{{index .RepoDigests 0}}' ghcr.io/shamaevnn/ybs-summer-2022:latest)
+#            ybs_backend --with-registry-auth
 
       - name: kill vpn
         if: always()
