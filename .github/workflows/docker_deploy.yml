@@ -25,7 +25,7 @@ jobs:
         uses: golfzaptw/action-connect-ovpn@master
         id: connect_vpn
         with:
-          PING_URL: ${{ secrets.PING_URL }}
+          PING_URL: '127.0.0.1'
           FILE_OVPN: '.github/vpn/config.ovpn'
         env:
           CA_CRT: ${{ secrets.CA_CRT}}
