@@ -77,8 +77,27 @@ make lint
 
 
 ## Deployment info
-This app is deployed via [dokku](https://dokku.com/) -- free open-source version of Heroku.
-Unfortunately, I haven't managed to deploy it to Yandex servers. Probably, because of VPN.
+Deploy to production via `GitHub Actions` consists of 3 steps:
+1. Check all linters via pre-commit, it runs on any branch/pull request.
 
-* Push or pull request to any branch triggers `checks.yml` github action with linters
-* Push to `master` begins deployment process
+If it's success, then:
+2. Login to github registry, build and push docker image to there.
+3. Go to server via ssh and VPN, pull built docker image, stop old ones, start new one.
+
+---
+
+To deploy, you have to set several secret variables:
+1. `VPN variables`.You can get it from your `.ovpn` file. Check [here](https://github.com/marketplace/actions/connect-vpn#how-to-prepare-file-ovpn) for more info.
+```
+CA_CRT  # encode to base64 content of <ca>
+USER_CRT  # ... of <cert>
+USER_KEY  # ... of <key>
+VPN_FILE  #  check instruction above
+```
+2. `DATABASE_URL`, where your info about items will be stored, example:
+```
+postgresql://postgres:b9a59b43439d3ebac8a410c9@86.208.71.101:15336/ybs
+```
+3. `SERVER_IP` -- address of your server with backend.
+4. `TOKEN_GITHUB` -- token with access to write/read/delete packages, check [this instruction](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
+5. `SSH_PRIVATE_KEY` -- private key, which has access to server.
