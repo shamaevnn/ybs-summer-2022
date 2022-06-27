@@ -48,11 +48,14 @@ jobs:
           docker push ghcr.io/shamaevnn/ybs-summer-2022:latest
       - name: deploy
         uses: appleboy/ssh-action@master
+        env:
+          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: >
+            echo $TOKEN_GITHUB &&
             echo $TOKEN_GITHUB | sudo docker login ghcr.io -u shamaevnn --password-stdin &&
             sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest &&
             sudo docker service update --image $(docker inspect --type image --format '{{index .RepoDigests 0}}' ghcr.io/shamaevnn/ybs-summer-2022:latest)
