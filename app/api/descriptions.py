@@ -1,7 +1,8 @@
 get_nodes = """
 Получить информацию об элементе по идентификатору.
- При получении информации о категории также предоставляется информация о её дочерних элементах.  # noqa
- """
+При получении информации о категории также предоставляется
+информация о её дочерних элементах.
+"""
 
 delete_node = """
 Удалить элемент по идентификатору.
@@ -29,5 +30,5 @@ These endpoints allow you to:
  * GET info about item with **all it's children**
  * POST many items at once
  * DELETE items and all **all it's children**
- * GET list of items for which price has changed in from [date - 24h, date]
+ * GET list of items for which price has changed in period [date - 24h, date]
 """
