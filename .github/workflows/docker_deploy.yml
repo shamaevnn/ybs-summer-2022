@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - master
-#  workflow_run:
-#    workflows: [ "checks" ]
-#    types: [ completed ]
+  workflow_run:
+    workflows: [ "checks" ]
+    types: [ completed ]
 
 env:
   TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
@@ -17,7 +17,7 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-#    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -42,8 +42,6 @@ jobs:
         run: echo "status of open vpn " ${{ steps.connect_vpn.outputs.STATUS }}
 
       - name: docker login
-#        env:
-#          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
         run: |
           echo $TOKEN_GITHUB | docker login ghcr.io -u shamaevnn --password-stdin
       - name: docker build
@@ -54,8 +52,6 @@ jobs:
           docker push ghcr.io/shamaevnn/ybs-summer-2022:latest
       - name: deploy
         uses: appleboy/ssh-action@master
-#        env:
-#          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ubuntu
@@ -65,15 +61,10 @@ jobs:
             sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest
 
             sudo docker ps -q --filter "name=$(echo $IMAGE_NAME)" | grep -q . && sudo docker stop $(echo $IMAGE_NAME) && sudo docker rm -fv $(echo $IMAGE_NAME)
-            sudo docker run -d -e DATABASE_URL=$(echo $DATABASE_URL) \
+            sudo docker run -d -p 80:80 -e DATABASE_URL=$(echo $DATABASE_URL) \
             --restart always \
             --name $(echo $IMAGE_NAME) \
             $(echo $REGISTRY)/$(echo $IMAGE_NAME):latest
-#            sudo docker-compose -f docker-compose.backend.yml -p backend pull
-#            sudo docker-compose -f docker-compose.backend.yml -p backend up -d --build
-#            sudo docker service update --image $(sudo docker inspect --type image --format '{{index .RepoDigests 0}}' ghcr.io/shamaevnn/ybs-summer-2022:latest) ybs_backend --with-registry-auth
-#            sudo echo $TOKEN_GITHUB &&
-#            sudo docker login ghcr.io -u shamaevnn --password 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
 
       - name: kill vpn
         if: always()
