@@ -10,6 +10,8 @@ on:
 
 env:
   TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
+  REGISTRY: "ghcr.io/shamaevnn"
+  IMAGE_NAME: "ybs-summer-2022"
 
 jobs:
   deploy:
@@ -57,10 +59,17 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: IMAGE_NAME,REGISTRY,GITHUB_SHA
           script: |
-            sudo docker-compose -f docker-compose.backend.yml -p backend pull
-            sudo docker-compose -f docker-compose.backend.yml -p backend up -d --build
-#            sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest &&
+            sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest --name $IMAGE_NAME
+
+            docker ps -q --filter "name=$(echo $IMAGE_NAME)" | grep -q . && docker stop $(echo $IMAGE_NAME) && docker rm -fv $(echo $IMAGE_NAME)
+            docker run -d \
+            --restart always \
+            --name $(echo $IMAGE_NAME) \
+            $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+#            sudo docker-compose -f docker-compose.backend.yml -p backend pull
+#            sudo docker-compose -f docker-compose.backend.yml -p backend up -d --build
 #            sudo docker service update --image $(sudo docker inspect --type image --format '{{index .RepoDigests 0}}' ghcr.io/shamaevnn/ybs-summer-2022:latest) ybs_backend --with-registry-auth
 #            sudo echo $TOKEN_GITHUB &&
 #            sudo docker login ghcr.io -u shamaevnn --password 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
