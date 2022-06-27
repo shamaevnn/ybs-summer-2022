@@ -11,7 +11,6 @@ import pytest
 from sqlalchemy_utils import create_database, drop_database
 from yarl import URL
 
-from app.db.base import settings
 
 PROJECT_PATH = Path(__file__).parent.parent.resolve()
 
@@ -58,7 +57,8 @@ def postgres():
     Создает временную БД для запуска теста.
     """
     tmp_name = ".".join([uuid.uuid4().hex, "pytest"])
-    tmp_url = str(URL(settings.database_url).with_path(tmp_name))
+
+    tmp_url = str(URL(os.getenv("DATABASE_URL")).with_path(tmp_name))
     create_database(tmp_url)
 
     try:

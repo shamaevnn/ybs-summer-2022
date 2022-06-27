@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - uses: actions/setup-python@v2
         with:
           python-version: '3.10.5'
       - run: pip install -r requirements.dev.txt && pip install -r requirements.txt
-      - run: |
-          $(echo $DATABASE_URL) > .env
-          pytest .
+      - run: pytest .
       - uses: pre-commit/action@v2.0.3

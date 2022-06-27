@@ -5,8 +5,8 @@ httpx==0.18.2
 python-dotenv==0.19.2
 
 psycopg2-binary==2.9.3
-databases==0.5.5
-SQLAlchemy==1.4
+databases==0.6.0
+SQLAlchemy==1.4.39
 asyncpg==0.25.0
 alembic==1.7.5
 

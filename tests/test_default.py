@@ -270,7 +270,10 @@ def _test_delete():
     print("Test delete passed.")
 
 
-# def test_all():
+def test_all():
+    pass
+
+
 #     _test_import()
 #     _test_nodes()
 #     _test_sales()
@@ -292,8 +295,7 @@ def main():
         API_BASEURL = API_BASEURL[:-1]
 
     if test_name is None:
-        pass
-        # test_all()
+        test_all()
     else:
         test_func = globals().get(f"test_{test_name}")
         if not test_func:
