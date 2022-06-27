@@ -64,7 +64,7 @@ jobs:
             sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest
 
             sudo docker ps -q --filter "name=$(echo $IMAGE_NAME)" | grep -q . && sudo docker stop $(echo $IMAGE_NAME) && sudo docker rm -fv $(echo $IMAGE_NAME)
-            sudo docker run -d \
+            sudo docker run -d -e DATABASE_URL=$(echo $DATABASE_URL) \
             --restart always \
             --name $(echo $IMAGE_NAME) \
             $(echo $REGISTRY)/$(echo $IMAGE_NAME):latest
