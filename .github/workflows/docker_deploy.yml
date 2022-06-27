@@ -49,14 +49,13 @@ jobs:
       - name: deploy
         uses: appleboy/ssh-action@master
         with:
-          host: '10.22.2.152'
+          host: ${{ secrets.SERVER_IP }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: sudo whoami
+          script: >
+            sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest &&
+            sudo docker service update --image $(docker inspect --type image --format '{{index .RepoDigests 0}}' ghcr.io/shamaevnn/ybs-summer-2022:latest)
 
       - name: kill vpn
         if: always()
         run: sudo killall openvpn
-#          script: >
-#            sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest &&
-#            sudo docker service update --image $(docker inspect --type image --format '{{index .RepoDigests 0}}' ghcr.io/shamaevnn/ybs-summer-2022:latest)
