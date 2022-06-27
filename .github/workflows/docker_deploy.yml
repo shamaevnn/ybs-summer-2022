@@ -1,4 +1,4 @@
-name: "docker_deploy"
+name: "deploy"
 
 on:
   push:
@@ -15,9 +15,30 @@ env:
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
 jobs:
-  deploy:
+  publish_image_to_registry:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: docker login
+        run: |
+          echo $TOKEN_GITHUB | docker login ghcr.io -u shamaevnn --password-stdin
+
+      - name: docker build
+        run: |
+          docker build . -t ghcr.io/shamaevnn/ybs-summer-2022:latest
+
+      - name: docker push
+        run: |
+          docker push ghcr.io/shamaevnn/ybs-summer-2022:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ contains(join(needs.*.result, ','), 'success') }}
+    needs: [ publish_image_to_registry ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -41,15 +62,6 @@ jobs:
       - name: Check Connect VPN
         run: echo "status of open vpn " ${{ steps.connect_vpn.outputs.STATUS }}
 
-      - name: docker login
-        run: |
-          echo $TOKEN_GITHUB | docker login ghcr.io -u shamaevnn --password-stdin
-      - name: docker build
-        run: |
-          docker build . -t ghcr.io/shamaevnn/ybs-summer-2022:latest
-      - name: docker push
-        run: |
-          docker push ghcr.io/shamaevnn/ybs-summer-2022:latest
       - name: deploy
         uses: appleboy/ssh-action@master
         with:
