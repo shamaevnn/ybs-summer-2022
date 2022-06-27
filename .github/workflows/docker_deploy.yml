@@ -16,6 +16,28 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+#      - name: Install Open VPN
+#        run: |
+#          sudo apt-get install openvpn
+#          echo "${{ secrets.VPN_FILE }}" > .github/vpn/config.ovpn
+#
+#      - name: Connect VPN
+#        uses: golfzaptw/action-connect-ovpn@master
+#        id: connect_vpn
+#        with:
+#          PING_URL: '127.0.0.1'
+#          FILE_OVPN: '.github/vpn/config.ovpn'
+#        env:
+#          CA_CRT: ${{ secrets.CA_CRT}}
+#          USER_CRT: ${{ secrets.USER_CRT }}
+#          USER_KEY: ${{ secrets.USER_KEY }}
+#
+#      - name: Check Connect VPN
+#        run: echo ${{ steps.connect_vpn.outputs.STATUS }}
+#
+#      - name: kill vpn
+#        if: always()
+#        run: sudo killall openvpn
       - name: docker login
         env:
           TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
@@ -30,7 +52,7 @@ jobs:
       - name: deploy
         uses: appleboy/ssh-action@master
         with:
-          host: 10.22.2.152:22
+          host: '10.22.2.152'
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: sudo whoami
