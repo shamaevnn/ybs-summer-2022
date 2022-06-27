@@ -61,10 +61,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           envs: IMAGE_NAME,REGISTRY,GITHUB_SHA
           script: |
-            sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest --name $IMAGE_NAME
+            sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest
 
-            docker ps -q --filter "name=$(echo $IMAGE_NAME)" | grep -q . && docker stop $(echo $IMAGE_NAME) && docker rm -fv $(echo $IMAGE_NAME)
-            docker run -d \
+            sudo docker ps -q --filter "name=$(echo $IMAGE_NAME)" | grep -q . && sudo docker stop $(echo $IMAGE_NAME) && sudo docker rm -fv $(echo $IMAGE_NAME)
+            sudo docker run -d \
             --restart always \
             --name $(echo $IMAGE_NAME) \
             $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
