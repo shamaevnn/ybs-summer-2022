@@ -1,0 +1,38 @@
+name: "deploy"
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: docker login
+        env:
+          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
+        run: |
+          echo $TOKEN_GITHUB | docker login ghcr.io -u shamaevnn --password-stdin
+      - name: docker build
+        run: |
+          docker build . -t ghcr.io/shamaevnn/ybs-summer-2022:latest
+      - name: mypy check
+        run: |
+          docker run ghcr.io/shamaevnn/ybs-summer-2022 /bin/bash -c "pip install -r requirements.dev.txt && pip install -r requirements.txt && mypy --config ./mypy.ini ."
+      - name: docker push
+        run: |
+          docker push ghcr.io/shamaevnn/ybs-summer-2022:latest
+      - name: deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: >
+            docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest &&
+            docker service update --image $(docker inspect --type image --format '{{index .RepoDigests 0}}' ghcr.io/shamaevnn/ybs-summer-2022:latest)

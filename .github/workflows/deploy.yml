@@ -3,7 +3,7 @@ name: "deploy"
 on:
   push:
     branches:
-      - master
+      - asdasdasd123
   workflow_run:
     workflows: [ "checks" ]
     types: [ completed ]
