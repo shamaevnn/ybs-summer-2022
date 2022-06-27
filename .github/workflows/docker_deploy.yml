@@ -4,14 +4,14 @@ on:
   push:
     branches:
       - master
-  workflow_run:
-    workflows: [ "checks" ]
-    types: [ completed ]
+#  workflow_run:
+#    workflows: [ "checks" ]
+#    types: [ completed ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+#    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -30,10 +30,10 @@ jobs:
       - name: deploy
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SERVER_IP }}
+          host: 10.22.2.152:22
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script: >
-            sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest &&
-            sudo docker service update --image $(docker inspect --type image --format '{{index .RepoDigests 0}}' ghcr.io/shamaevnn/ybs-summer-2022:latest)
+          script: sudo whoami
+#          script: >
+#            sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest &&
+#            sudo docker service update --image $(docker inspect --type image --format '{{index .RepoDigests 0}}' ghcr.io/shamaevnn/ybs-summer-2022:latest)
