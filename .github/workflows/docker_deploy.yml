@@ -12,6 +12,7 @@ env:
   TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
   REGISTRY: "ghcr.io/shamaevnn"
   IMAGE_NAME: "ybs-summer-2022"
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
 jobs:
   deploy:
@@ -59,7 +60,7 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: IMAGE_NAME,REGISTRY,GITHUB_SHA
+          envs: IMAGE_NAME,REGISTRY,GITHUB_SHA,DATABASE_URL
           script: |
             sudo docker pull ghcr.io/shamaevnn/ybs-summer-2022:latest
 
